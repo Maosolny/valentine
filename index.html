@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will You Be My Valentine?</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+    color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* QUIZ BOX */
+.quiz-box {
+    text-align: center;
+    background: rgba(0,0,0,0.7);
+    padding: 50px;
+    border-radius: 25px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    max-width: 600px;
+    transition: opacity 0.6s ease;
+}
+
+.question {
+    display: none;
+    animation: fadeIn 0.6s ease forwards;
+}
+
+.question.active {
+    display: block;
+}
+
+.quiz-box h2 {
+    color: #d4af37;
+    margin-bottom: 30px;
+}
+
+.quiz-box input {
+    padding: 12px;
+    margin-top: 15px;
+    width: 80%;
+    border-radius: 12px;
+    border: none;
+    text-align: center;
+    font-size: 1em;
+}
+
+.quiz-box button {
+    margin-top: 20px;
+}
+
+/* WALENTYNKA */
+.container {
+    display: none;
+    text-align: center;
+    padding: 50px;
+    max-width: 1000px;
+    animation: fadeIn 1s ease forwards;
+}
+
+h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5em;
+    color: #d4af37;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-weight: 300;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+    color: #ddd;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.photo-frame {
+    background: white;
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    transition: 0.4s;
+}
+
+.photo-frame:hover {
+    transform: translateY(-10px);
+}
+
+.photo-frame img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+button {
+    padding: 15px 35px;
+    font-size: 1.1em;
+    border-radius: 50px;
+    border: 2px solid #d4af37;
+    cursor: pointer;
+    margin: 10px;
+    background: transparent;
+    color: #d4af37;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #d4af37;
+    color: black;
+}
+
+.hidden-message {
+    display: none;
+    margin-top: 30px;
+    font-size: 2em;
+    color: #d4af37;
+}
+
+.heart {
+    position: fixed;
+    color: #d4af37;
+    font-size: 20px;
+    animation: floatUp 6s linear infinite;
+    opacity: 0.4;
+}
+
+@keyframes fadeIn {
+    from {opacity:0;}
+    to {opacity:1;}
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(100vh); }
+    100% { transform: translateY(-10vh); }
+}
+
+.error {
+    color: #ff6b6b;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- QUIZ -->
+<div class="quiz-box" id="quiz">
+
+    <h2>Only true love can unlock this 💛</h2>
+
+    <div class="question active" id="q1-box">
+        <p>Where did we first meet?</p>
+        <input type="text" id="q1">
+        <br>
+        <button onclick="nextQuestion(1)">Next</button>
+        <div class="error" id="error1"></div>
+    </div>
+
+    <div class="question" id="q2-box">
+        <p>What’s our favorite dog breed?</p>
+        <input type="text" id="q2">
+        <br>
+        <button onclick="nextQuestion(2)">Next</button>
+        <div class="error" id="error2"></div>
+    </div>
+
+    <div class="question" id="q3-box">
+        <p>What date did we become "us"?</p>
+        <input type="text" id="q3">
+        <br>
+        <button onclick="nextQuestion(3)">Unlock 💌</button>
+        <div class="error" id="error3"></div>
+    </div>
+
+</div>
+
+<!-- WALENTYNKA -->
+<div class="container" id="valentine">
+    <h1>Will You Be My Valentine?</h1>
+    <div class="subtitle">With you, every day feels luxurious ✨</div>
+
+    <div class="gallery">
+        <div class="photo-frame"><img src="photo1.jpg"></div>
+        <div class="photo-frame"><img src="photo2.jpg"></div>
+        <div class="photo-frame"><img src="photo3.jpg"></div>
+        <div class="photo-frame"><img src="photo4.jpg"></div>
+    </div>
+
+    <div>
+        <button onclick="sayYes()">YES, of course 💍</button>
+        <button onmouseover="moveButton(this)">I don't know 😏</button>
+    </div>
+
+    <div class="hidden-message" id="loveMessage">
+        Best decision ever 🐩🐶🐾
+    </div>
+</div>
+
+<script>
+const answers = [
+    "warszawa",
+    "pomeranian",
+    "14.02.2023"
+];
+
+function nextQuestion(step) {
+    let input = document.getElementById("q" + step).value.toLowerCase();
+    
+    if (input === answers[step - 1]) {
+
+        // 🔊 play bark
+        const bark = document.getElementById("barkSound");
+        bark.currentTime = 0;
+        bark.play();
+
+        document.getElementById("q" + step + "-box").classList.remove("active");
+        
+        if (step < 3) {
+            document.getElementById("q" + (step + 1) + "-box").classList.add("active");
+        } else {
+            unlockValentine();
+        }
+    } else {
+        document.getElementById("error" + step).innerText = "Hmm... try again 😏";
+    }
+}
+
+function unlockValentine() {
+    document.getElementById("quiz").style.opacity = "0";
+    setTimeout(() => {
+        document.getElementById("quiz").style.display = "none";
+        document.getElementById("valentine").style.display = "block";
+    }, 600);
+}
+
+function moveButton(button) {
+    const x = Math.random() * 300 - 150;
+    const y = Math.random() * 200 - 100;
+    button.style.transform = `translate(${x}px, ${y}px)`;
+}
+
+function sayYes() {
+    document.getElementById("loveMessage").style.display = "block";
+    createHearts();
+}
+
+function createHearts() {
+    for(let i=0; i<20; i++){
+        let heart = document.createElement("div");
+        heart.className = "heart";
+        heart.innerHTML = "♥";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = (Math.random()*3 + 3) + "s";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 6000);
+    }
+}
+</script>
+<audio id="barkSound" src="bark.m4a" preload="auto"></audio>
+</body>
+</html>
