@@ -203,10 +203,10 @@ button:hover {
         <div class="photo-frame"><img src="photo4.jpg"></div>
     </div>
 
-    <div>
-        <button onclick="sayYes()"> TAK!!! 💍</button>
-        <button onmouseover="moveButton(this)">Zobaczymy, czas pokaże 😏</button>
-    </div>
+<div>
+    <button onclick="sayYes()">TAK!!! 💍</button>
+    <button onclick="moveButton(this)">Zobaczymy, czas pokaże 😏</button>
+</div>
 
     <div class="hidden-message" id="loveMessage">
         Lofciam Cię ❤️🐩🐶🐾❤️
@@ -271,13 +271,14 @@ function unlockValentine() {
 }
 
 function moveButton(button) {
-    // Odpal piosenkę Zenka
     const mandacik = document.getElementById("mandacikSound");
+    
+    // Odpal piosenkę tylko jeśli jeszcze nie gra
     if (mandacik.paused) {
-        mandacik.play();
+        mandacik.play().catch(error => console.log("Czekam na interakcję..."));
     }
 
-    // Losowanie pozycji (uciekanie przycisku)
+    // Losowanie nowej pozycji (ucieczka)
     const x = Math.random() * (window.innerWidth - button.offsetWidth) - (window.innerWidth / 2 - 100);
     const y = Math.random() * (window.innerHeight - button.offsetHeight) - (window.innerHeight / 2 - 100);
     
