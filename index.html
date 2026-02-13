@@ -209,7 +209,7 @@ button:hover {
 </div>
 
     <div class="hidden-message" id="loveMessage">
-        Lofciam Cię ❤️🐩🐶🐾❤️
+	Lofciam Cię ❤️<br>❤️🐩🐶🐾❤️
     </div>
 </div>
 
@@ -230,20 +230,27 @@ const messages = [
 
 function nextQuestion(step) {
     let input = document.getElementById("q" + step).value.toLowerCase().trim();
-    
-    if (input === answers[step - 1]) {
-        // Czyścimy komunikat błędu przed przejściem dalej
-        document.getElementById("error" + step).innerText = "";
+    let isCorrect = false;
 
-        // 🔊 Bezpieczne odtwarzanie dźwięku
-        const bark = document.getElementById("barkSound");
-        if (bark) {
-            bark.currentTime = 0;
-            bark.play().catch(e => console.log("Audio block: " + e.message)); 
-            // .catch zapobiega wywaleniu się kodu, jeśli dźwięk nie zadziała
+    // Sprawdzanie odpowiedzi
+    if (step === 3) {
+        // Dla trzeciego pytania akceptujemy dwie wersje daty
+        if (input === "08.11.2023" || input === "8.11.2023") {
+            isCorrect = true;
         }
+    } else {
+        // Dla pozostałych pytań sprawdzamy standardowo z tablicy
+        if (input === answers[step - 1]) {
+            isCorrect = true;
+        }
+    }
 
-        // Przełączanie widoku
+    if (isCorrect) {
+        // 🔊 Odtwórz szczekanie
+        const bark = document.getElementById("barkSound");
+        bark.currentTime = 0;
+        bark.play().catch(e => console.log("Audio play blocked"));
+
         document.getElementById("q" + step + "-box").classList.remove("active");
         
         if (step < 3) {
@@ -252,7 +259,7 @@ function nextQuestion(step) {
             unlockValentine();
         }
     } else {
-        // Losowanie i wyświetlanie błędu
+         // Losowanie i wyświetlanie błędu
         const randomMessage = messages[Math.floor(Math.random() * messages.length)];
         document.getElementById("error" + step).innerText = randomMessage;
     }
@@ -272,34 +279,45 @@ function unlockValentine() {
 
 function moveButton(button) {
     const mandacik = document.getElementById("mandacikSound");
-    
-    // Odpal piosenkę tylko jeśli jeszcze nie gra
-    if (mandacik.paused) {
-        mandacik.play().catch(error => console.log("Czekam na interakcję..."));
-    }
+    const stumblin = document.getElementById("stumblinSound");
 
-    // Losowanie nowej pozycji (ucieczka)
-    const x = Math.random() * (window.innerWidth - button.offsetWidth) - (window.innerWidth / 2 - 100);
-    const y = Math.random() * (window.innerHeight - button.offsetHeight) - (window.innerHeight / 2 - 100);
+    // 1. ZATRZYMAJ STUMBLIN (kota), jeśli gra
+    stumblin.pause();
+    stumblin.currentTime = 0;
+
+    // 2. ODPAL ZENKA
+    mandacik.muted = false;
+    mandacik.currentTime = 0; // Zaczyna od nowa przy każdym ucieknięciu
+    mandacik.play().catch(e => console.log("Błąd Zenka"));
+
+    // Logika uciekania przycisku
+    const x = Math.random() * (window.innerWidth - button.offsetWidth - 50) - (window.innerWidth / 2 - 100);
+    const y = Math.random() * (window.innerHeight - button.offsetHeight - 50) - (window.innerHeight / 2 - 100);
     
     button.style.position = "relative";
     button.style.transform = `translate(${x}px, ${y}px)`;
 }
 
 function sayYes() {
-    // 1. Zatrzymaj Zenka (mandacik)
     const mandacik = document.getElementById("mandacikSound");
-    mandacik.pause();
-    mandacik.currentTime = 0; // Przewiń do początku na wypadek, gdyby chciała klikać jeszcze raz
-
-    // 2. Odpal piosenkę o kotku
     const stumblin = document.getElementById("stumblinSound");
-    stumblin.currentTime = 0;
-    stumblin.play();
 
-    // 3. Reszta Twoich efektów
+    // 1. ZATRZYMAJ ZENKA (mandacik)
+    mandacik.pause();
+    mandacik.currentTime = 0;
+
+    // 2. ODPAL STUMBLIN
+    stumblin.muted = false;
+    stumblin.currentTime = 0;
+    stumblin.play().catch(e => console.log("Błąd Stumblin"));
+
+    // Reszta efektów
     document.getElementById("loveMessage").style.display = "block";
-    setInterval(createHearts, 3000); // Serduszka będą się pojawiać falami
+    
+    if (!window.heartInterval) {
+        createHearts();
+        window.heartInterval = setInterval(createHearts, 2000);
+    }
 }
 
 function createHearts() {
