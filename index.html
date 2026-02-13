@@ -161,12 +161,12 @@ button:hover {
 <body>
 
 <!-- QUIZ -->
+
 <div class="quiz-box" id="quiz">
+    <h2>Tylko prawdziwa Juleczka może to odblokować 💛</h2>
 
-    <h2>Only true love can unlock this 💛</h2>
-
-    <div class="question active" id="q1-box">
-        <p>Where did we first meet?</p>
+    <div class="question active" id="q1-box"
+        <p>Jak mówisz na swojego narzeczonego?</p>
         <input type="text" id="q1">
         <br>
         <button onclick="nextQuestion(1)">Next</button>
@@ -174,7 +174,7 @@ button:hover {
     </div>
 
     <div class="question" id="q2-box">
-        <p>What’s our favorite dog breed?</p>
+        <p>Moja ulubiona rasa psa to:</p>
         <input type="text" id="q2">
         <br>
         <button onclick="nextQuestion(2)">Next</button>
@@ -182,10 +182,10 @@ button:hover {
     </div>
 
     <div class="question" id="q3-box">
-        <p>What date did we become "us"?</p>
+        <p>Kiedy się zaręczyliśmy?</p>
         <input type="text" id="q3">
         <br>
-        <button onclick="nextQuestion(3)">Unlock 💌</button>
+        <button onclick="nextQuestion(3)">Odblokuj Walentykę 💌</button>
         <div class="error" id="error3"></div>
     </div>
 
@@ -194,7 +194,7 @@ button:hover {
 <!-- WALENTYNKA -->
 <div class="container" id="valentine">
     <h1>Will You Be My Valentine?</h1>
-    <div class="subtitle">With you, every day feels luxurious ✨</div>
+    <div class="subtitle">Z Tobą każdy dzień jest lepszy ✨</div>
 
     <div class="gallery">
         <div class="photo-frame"><img src="photo1.jpg"></div>
@@ -204,32 +204,46 @@ button:hover {
     </div>
 
     <div>
-        <button onclick="sayYes()">YES, of course 💍</button>
-        <button onmouseover="moveButton(this)">I don't know 😏</button>
+        <button onclick="sayYes()"> TAK!!! 💍</button>
+        <button onmouseover="moveButton(this)">Zobaczymy, czas pokaże 😏</button>
     </div>
 
     <div class="hidden-message" id="loveMessage">
-        Best decision ever 🐩🐶🐾
+        Lofciam Cię ❤️🐩🐶🐾❤️
     </div>
 </div>
 
 <script>
 const answers = [
-    "warszawa",
-    "pomeranian",
-    "14.02.2023"
+    "mikunia",
+    "pudelek",
+    "08.11.2023"
+];
+
+const messages = [
+    "Hmm... spróbuj ponownie 😏",
+    "Prawie! Ale to jeszcze nie to... 🧐",
+    "Oj, pudło! Spróbujesz jeszcze raz? 🏀",
+    "Nie poddawaj się, jesteś blisko! 💪",
+    "Twoja odpowiedź i prawda to dwie różne bajki 📖"
 ];
 
 function nextQuestion(step) {
-    let input = document.getElementById("q" + step).value.toLowerCase();
+    let input = document.getElementById("q" + step).value.toLowerCase().trim();
     
     if (input === answers[step - 1]) {
+        // Czyścimy komunikat błędu przed przejściem dalej
+        document.getElementById("error" + step).innerText = "";
 
-        // 🔊 play bark
+        // 🔊 Bezpieczne odtwarzanie dźwięku
         const bark = document.getElementById("barkSound");
-        bark.currentTime = 0;
-        bark.play();
+        if (bark) {
+            bark.currentTime = 0;
+            bark.play().catch(e => console.log("Audio block: " + e.message)); 
+            // .catch zapobiega wywaleniu się kodu, jeśli dźwięk nie zadziała
+        }
 
+        // Przełączanie widoku
         document.getElementById("q" + step + "-box").classList.remove("active");
         
         if (step < 3) {
@@ -238,41 +252,69 @@ function nextQuestion(step) {
             unlockValentine();
         }
     } else {
-        document.getElementById("error" + step).innerText = "Hmm... try again 😏";
+        // Losowanie i wyświetlanie błędu
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        document.getElementById("error" + step).innerText = randomMessage;
     }
 }
 
 function unlockValentine() {
-    document.getElementById("quiz").style.opacity = "0";
+    const quiz = document.getElementById("quiz");
+    quiz.style.opacity = "0";
     setTimeout(() => {
-        document.getElementById("quiz").style.display = "none";
-        document.getElementById("valentine").style.display = "block";
+        quiz.style.display = "none";
+        const val = document.getElementById("valentine");
+        val.style.display = "block";
+        // Dodatkowe wywołanie serduszek dla efektu wow na wejściu
+        createHearts(); 
     }, 600);
 }
 
 function moveButton(button) {
-    const x = Math.random() * 300 - 150;
-    const y = Math.random() * 200 - 100;
+    // Odpal piosenkę Zenka
+    const mandacik = document.getElementById("mandacikSound");
+    if (mandacik.paused) {
+        mandacik.play();
+    }
+
+    // Losowanie pozycji (uciekanie przycisku)
+    const x = Math.random() * (window.innerWidth - button.offsetWidth) - (window.innerWidth / 2 - 100);
+    const y = Math.random() * (window.innerHeight - button.offsetHeight) - (window.innerHeight / 2 - 100);
+    
+    button.style.position = "relative";
     button.style.transform = `translate(${x}px, ${y}px)`;
 }
 
 function sayYes() {
+    // 1. Zatrzymaj Zenka (mandacik)
+    const mandacik = document.getElementById("mandacikSound");
+    mandacik.pause();
+    mandacik.currentTime = 0; // Przewiń do początku na wypadek, gdyby chciała klikać jeszcze raz
+
+    // 2. Odpal piosenkę o kotku
+    const stumblin = document.getElementById("stumblinSound");
+    stumblin.currentTime = 0;
+    stumblin.play();
+
+    // 3. Reszta Twoich efektów
     document.getElementById("loveMessage").style.display = "block";
-    createHearts();
+    setInterval(createHearts, 3000); // Serduszka będą się pojawiać falami
 }
 
 function createHearts() {
-    for(let i=0; i<20; i++){
+    for(let i=0; i<25; i++){
         let heart = document.createElement("div");
         heart.className = "heart";
         heart.innerHTML = "♥";
         heart.style.left = Math.random() * 100 + "vw";
         heart.style.animationDuration = (Math.random()*3 + 3) + "s";
         document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 6000);
+        setTimeout(() => heart.remove(), 5000);
     }
 }
 </script>
 <audio id="barkSound" src="bark.m4a" preload="auto"></audio>
+<audio id="mandacikSound" src="mandacik.mp3" preload="auto"></audio>
+<audio id="stumblinSound" src="stumblin.mp3" preload="auto"></audio>
 </body>
 </html>
